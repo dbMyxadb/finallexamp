@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36202.13 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "finallexamp", "finallexamp\finallexamp.csproj", "{319C83F8-C578-41CA-9F51-C4B16FD8C59A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "finallexamp.DAL", "finallexamp.DAL\finallexamp.DAL.csproj", "{50778EB5-5915-4DBF-8B91-EFD3D17DBB12}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{319C83F8-C578-41CA-9F51-C4B16FD8C59A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{319C83F8-C578-41CA-9F51-C4B16FD8C59A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{319C83F8-C578-41CA-9F51-C4B16FD8C59A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{319C83F8-C578-41CA-9F51-C4B16FD8C59A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50778EB5-5915-4DBF-8B91-EFD3D17DBB12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50778EB5-5915-4DBF-8B91-EFD3D17DBB12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50778EB5-5915-4DBF-8B91-EFD3D17DBB12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50778EB5-5915-4DBF-8B91-EFD3D17DBB12}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4D74D239-A062-48D3-BB84-D69D6F562245}
+	EndGlobalSection
+EndGlobal
