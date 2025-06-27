@@ -22,13 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\finallexamp.Api\finallexamp.Api.csproj" />
     <ProjectReference Include="..\finallexamp.DAL\finallexamp.DAL.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
-﻿using finallexamp.DAL.Interfaces;
-using finallexamp.DAL.Models;
+﻿using finallexamp.Core.Interfaces;
+using finallexamp.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace finallexamp.DAL.Repositories
@@ -13,26 +13,28 @@ namespace finallexamp.DAL.Repositories
             _context = context;
         }
 
-        public async Task<List<Animal>> GetAllAsync() => await _context.Animals.ToListAsync();
+        public async Task<List<Animal>> GetAllAsync() 
+        {
+            try
+            {
+                return await _context.Animals.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error fetching animals from the database.", ex);
+            }
+        }
 
-        public async Task<Animal> GetByNameAsync(string name) =>
-            await _context.Animals.FirstOrDefaultAsync(a => a.Name == name);
-
-        public async Task<List<Animal>> GetSortedAsync() =>
-            await _context.Animals.OrderBy(a => a.Name).ToListAsync();
-
-        public async Task<List<Animal>> GetByCountryCodeAsync(string code) =>
-            await _context.Animals.Where(a => a.CountryCode == code).ToListAsync();
 
         public async Task AddAsync(Animal animal)
         {
-            _context.Animals.Add(animal);
+            _context.Add(animal);
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Animal animal)
         {
-            _context.Animals.Update(animal);
+            _context.Update(animal);
             await _context.SaveChangesAsync();
         }
 
@@ -41,7 +43,7 @@ namespace finallexamp.DAL.Repositories
             var animal = await _context.Animals.FindAsync(id);
             if (animal != null)
             {
-                _context.Animals.Remove(animal);
+                _context.Remove(animal);
                 await _context.SaveChangesAsync();
             }
         }
