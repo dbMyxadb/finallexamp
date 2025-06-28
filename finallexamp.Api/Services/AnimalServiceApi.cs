@@ -75,6 +75,7 @@ namespace finallexamp.Api.Services
                 }
 
                 var animalsByName = JsonSerializer.Deserialize<List<WrapperAnimal>>(content);
+
                 if (animalsByName == null || !animalsByName.Any())
                 {
                     _loggerService.LogWarning("No animals found in the response.");

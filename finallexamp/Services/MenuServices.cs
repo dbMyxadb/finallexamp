@@ -16,7 +16,7 @@ namespace finallexamp.Services
         private readonly AnimalServiceApi _animalServiceApi;
         private readonly AnimalServices _animalService;
         private readonly AnimalDbContext _context;
-        public MenuServices()
+        public MenuServices(AnimalDbContext _context)
         {
             _logger = new LoggerService();
             _animalServiceApi = new AnimalServiceApi(new HttpClient(), new LoggerService());
@@ -26,7 +26,7 @@ namespace finallexamp.Services
         public void ShowMenu()
         {
             Console.WriteLine("Welcome to the Final Exam Menu! \n(api+bd)");
-            Console.WriteLine("1. Show all Animal (api+bd)");
+            Console.WriteLine("1. Show all Animal ");
             Console.WriteLine("2. Get all Animal by name");
             Console.WriteLine("3. Sort Animal by name");
             Console.WriteLine("4. Get all Animal by country code (UA,UK)");
@@ -153,7 +153,7 @@ namespace finallexamp.Services
                 _logger.LogError("Error fetching animals by name from API.", ex);
             }
 
-
+            /*
             Console.WriteLine("Animals from local DB: ");
             var animalsFromDb = await _animalService.GetAllAnimalsByNameAsync(AnimalName);
             if (animalsFromDb == null || !animalsFromDb.Any())
@@ -166,7 +166,7 @@ namespace finallexamp.Services
                 {
                     Console.WriteLine(animal);
                 }
-            }
+            }*/
 
         }
     }
