@@ -5,8 +5,8 @@ namespace finallexamp.Api.Interfaces
     public interface IAnimalServiceApi
     {
         Task<List<AnimalApi>> GetAllAnimalsByScientificNameAsync();
-        Task<List<WrapperAnimal>> GetAllAnimalsByNameAsync(string name);
-        Task<List<WrapperAnimal>> GetAllAnimalsByNameSortedAsync(string name);
-        Task<List<WrapperAnimal>> GetAllAnimalsByCountryIdAsync(string code);
+        Task<WrapperAnimal> GetAllAnimalsByNameAsync(string name);
+        Task<WrapperAnimal> GetAllAnimalsByNameSortedAsync();
+        Task<WrapperAnimal> GetAllAnimalsByCountryCodeAsync(string code);
     }
 }

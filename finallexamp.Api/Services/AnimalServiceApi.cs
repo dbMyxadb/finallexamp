@@ -54,9 +54,9 @@ namespace finallexamp.Api.Services
         }
 
 
-        public async Task<List<WrapperAnimal>> GetAllAnimalsByNameAsync(string name)
+        public async Task<WrapperAnimal> GetAllAnimalsByNameAsync(string name)
         {
-            var response = await _httpClient.GetAsync($"api/search?{name}");
+            var response = await _httpClient.GetAsync($"api/search?q={name}");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -67,16 +67,16 @@ namespace finallexamp.Api.Services
 
             try
             {
-                var content = response.Content.ReadAsStringAsync().Result;
+                var content = await response.Content.ReadAsStringAsync();
                 if (string.IsNullOrWhiteSpace(content))
                 {
                     _loggerService.LogWarning("Received empty response from API.");
-                    return new List<WrapperAnimal>();
+                    return new WrapperAnimal();
                 }
 
-                var animalsByName = JsonSerializer.Deserialize<List<WrapperAnimal>>(content);
+                var animalsByName = JsonSerializer.Deserialize<WrapperAnimal>(content);
 
-                if (animalsByName == null || !animalsByName.Any())
+                if (animalsByName?.Animals == null)
                 {
                     _loggerService.LogWarning("No animals found in the response.");
                 }
@@ -87,13 +87,14 @@ namespace finallexamp.Api.Services
             catch (JsonException ex)
             {
                 _loggerService.LogError($"Error deserializing response:", ex);
-                return new List<WrapperAnimal>();
+                return new WrapperAnimal();
             }
         }
 
-        public async Task<List<WrapperAnimal>> GetAllAnimalsByNameSortedAsync(string name)
+
+        public async Task<WrapperAnimal> GetAllAnimalsByNameSortedAsync()
         {
-            var response = await _httpClient.GetAsync($"api/search?q=Giant%2520Panda&sortType={name}");
+            var response = await _httpClient.GetAsync($"api/search?sortType=common_name");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -104,15 +105,16 @@ namespace finallexamp.Api.Services
 
             try
             {
-                var content = response.Content.ReadAsStringAsync().Result;
+                var content = await response.Content.ReadAsStringAsync();
                 if (string.IsNullOrWhiteSpace(content))
                 {
                     _loggerService.LogWarning("Received empty response from API.");
-                    return new List<WrapperAnimal>();
+                    return new WrapperAnimal();
                 }
 
-                var sortedAnimals = JsonSerializer.Deserialize<List<WrapperAnimal>>(content);
-                if (sortedAnimals == null || !sortedAnimals.Any())
+                var sortedAnimals = JsonSerializer.Deserialize<WrapperAnimal>(content);
+
+                if (sortedAnimals?.Animals == null)
                 {
                     _loggerService.LogWarning("No sorted animals found in the response.");
                 }
@@ -123,11 +125,12 @@ namespace finallexamp.Api.Services
             catch (JsonException ex)
             {
                 _loggerService.LogError($"Error deserializing response:", ex);
-                return new List<WrapperAnimal>();
+                return new WrapperAnimal();
             }
         }
 
-        public async Task<List<WrapperAnimal>> GetAllAnimalsByCountryIdAsync(string code)
+
+        public async Task<WrapperAnimal> GetAllAnimalsByCountryCodeAsync(string code)
         {
             var response = await _httpClient.GetAsync($"api/search?q=Giant%2520Panda&sortType={code}");
 
@@ -140,15 +143,15 @@ namespace finallexamp.Api.Services
 
             try
             {
-                var content = response.Content.ReadAsStringAsync().Result;
+                var content = await response.Content.ReadAsStringAsync();
                 if (string.IsNullOrWhiteSpace(content))
                 {
                     _loggerService.LogWarning("Received empty response from API.");
-                    return new List<WrapperAnimal>();
+                    return new WrapperAnimal();
                 }
 
-                var animalsByCountry = JsonSerializer.Deserialize<List<WrapperAnimal>>(content);
-                if (animalsByCountry == null || !animalsByCountry.Any())
+                var animalsByCountry = JsonSerializer.Deserialize<WrapperAnimal>(content);
+                if (animalsByCountry?.Animals == null)
                 {
                     _loggerService.LogWarning("No animals found for the specified country code.");
                 }
@@ -158,7 +161,7 @@ namespace finallexamp.Api.Services
             catch (JsonException ex)
             {
                 _loggerService.LogError($"Error deserializing response:", ex);
-                return new List<WrapperAnimal>();
+                return new WrapperAnimal();
             }
         }
     }

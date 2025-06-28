@@ -6,7 +6,7 @@ namespace finallexamp.Core.Interfaces
     {
         Task<List<Animal>> GetAllAnimalsByScientificNameAsync();
         Task<List<Animal>> GetAllAnimalsByNameAsync(string name);
-        Task<List<Animal>> GetAllAnimalsByNameSortedAsync(string name);
-        Task<List<Animal>> GetAllAnimalsByCountryIdAsync(string code);
+        Task<List<Animal>> GetAllAnimalsByNameSortedAsync();
+        Task<List<Animal>> GetAllAnimalsByCountryCodeAsync(string code);
     }
 }

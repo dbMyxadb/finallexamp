@@ -5,7 +5,7 @@ using finallexamp.Core.Models;
 
 namespace finallexamp.Core.Services
 {
-    public class AnimalServices
+    public class AnimalServices : IAnimalService
     {
         private readonly IAnimalRepository _animalRepository;
         private readonly ILoggerService _loggerService;
@@ -36,7 +36,7 @@ namespace finallexamp.Core.Services
                 throw;
             }
         }
-        public async Task<List<Animal>> GetAllAnimalsByNameAsync(string AnimalName)
+        public async Task<List<Animal>> GetAllAnimalsByNameAsync(string animalName)
         {
             try
             {
@@ -46,13 +46,13 @@ namespace finallexamp.Core.Services
                     _loggerService.LogWarning("No animals found in the database.");
                     return new List<Animal>();
                 }
-                var filteredAnimals = animals.Where(a => a.Name.Contains(AnimalName, StringComparison.OrdinalIgnoreCase)).ToList();
+                var filteredAnimals = animals.Where(a => a.Name.Contains(animalName, StringComparison.OrdinalIgnoreCase)).ToList();
                 if (!filteredAnimals.Any())
                 {
-                    _loggerService.LogWarning($"No animals found with name containing '{AnimalName}'.");
+                    _loggerService.LogWarning($"No animals found with name containing '{animalName}'.");
                     return new List<Animal>();
                 }
-                _loggerService.LogInformation($"Found {filteredAnimals.Count} animals with name containing '{AnimalName}'.");
+                _loggerService.LogInformation($"Found {filteredAnimals.Count} animals with name containing '{animalName}'.");
                 return filteredAnimals;
             }
             catch (Exception ex)
@@ -116,6 +116,63 @@ namespace finallexamp.Core.Services
                 throw;
             }
             await _animalRepository.DeleteAsync(id);
+        }
+
+        public Task<List<Animal>> GetAllAnimalsByCountryCodeAsync(string code)
+        {
+            try
+            {
+                var animals = _animalRepository.GetAllAsync().Result;
+                if (animals == null || !animals.Any())
+                {
+                    _loggerService.LogWarning("No animals found in the database.");
+                    return Task.FromResult(new List<Animal>());
+                }
+                
+                var filteredAnimals = animals.Where(a => a.CountryCode.Equals(code, StringComparison.OrdinalIgnoreCase)).ToList();
+                if (!filteredAnimals.Any())
+                {
+                    _loggerService.LogWarning($"No animals found with country code '{code}'.");
+                    return Task.FromResult(new List<Animal>());
+                }
+                
+                _loggerService.LogInformation($"Found {filteredAnimals.Count} animals with country code '{code}'.");
+                return Task.FromResult(filteredAnimals);
+            }
+            catch (Exception ex)
+            {
+                _loggerService.LogError($"Error fetching animals by country code: {ex.Message}", ex);
+                throw;
+            }
+        }
+
+        public Task<List<Animal>> GetAllAnimalsByNameSortedAsync()
+        {
+            try
+            {
+                var animals = _animalRepository.GetAllAsync().Result;
+                if (animals == null || !animals.Any())
+                {
+                    _loggerService.LogWarning("No animals found in the database.");
+                    return Task.FromResult(new List<Animal>());
+                }
+
+                var filteredAnimals = animals.OrderBy(a => a.Name).ToList();
+
+                if (!filteredAnimals.Any())
+                {
+                    _loggerService.LogWarning("No animals found after sorting by name.");
+                    return Task.FromResult(new List<Animal>());
+                }
+                
+                _loggerService.LogInformation($"Found {filteredAnimals.Count} animals sorted by name.");
+                return Task.FromResult(filteredAnimals);
+            }
+            catch (Exception ex)
+            {
+                _loggerService.LogError($"Error fetching and sorting animals by name: {ex.Message}", ex);
+                throw new ArgumentNullException("Animal cannot be null.");
+            }
         }
     }
 }

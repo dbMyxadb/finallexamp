@@ -1,12 +1,9 @@
-﻿
-using System;
-using finallexamp.Api.Interfaces;
+﻿using System;
+using System.Linq;
 using finallexamp.Api.Services;
-using finallexamp.Core.Interfaces;
 using finallexamp.Core.Services;
 using finallexamp.DAL;
 using finallexamp.DAL.Repositories;
-using Microsoft.Extensions.Logging;
 
 namespace finallexamp.Services
 {
@@ -16,12 +13,16 @@ namespace finallexamp.Services
         private readonly AnimalServiceApi _animalServiceApi;
         private readonly AnimalServices _animalService;
         private readonly AnimalDbContext _context;
-        public MenuServices(AnimalDbContext _context)
+
+
+        public MenuServices()
         {
+            _context = new AnimalDbContext();
             _logger = new LoggerService();
             _animalServiceApi = new AnimalServiceApi(new HttpClient(), new LoggerService());
             _animalService = new AnimalServices(new AnimalRepository(_context), new LoggerService());
         }
+
 
         public void ShowMenu()
         {
@@ -30,14 +31,9 @@ namespace finallexamp.Services
             Console.WriteLine("2. Get all Animal by name");
             Console.WriteLine("3. Sort Animal by name");
             Console.WriteLine("4. Get all Animal by country code (UA,UK)");
-            Console.WriteLine("===== Local bd =====");
-            Console.WriteLine("5. Add Animal");
-            Console.WriteLine("6. Update Animal");
-            Console.WriteLine("7. Delete Animal");
-
+            Console.WriteLine("5. Exit");
             Console.Write("Please select an option: ");
         }
-
 
 
         public async Task HandleMenuSelectionAsync()
@@ -47,47 +43,49 @@ namespace finallexamp.Services
             switch (choice)
             {
                 case "1":
-                    await GetAnimalByScintificName();
-
+                    await GetAnimalByScintificNameAsync();
                     break;
                 case "2":
-                    await GetAllAnimalsByName();
+                    await GetAllAnimalsByNameAsync();
                     break;
                 case "3":
-
+                    await SortedAnimalByNameAsync();
                     break;
                 case "4":
-
+                    await GetAllAnimalsByCountryCodeAsync();
                     break;
                 case "5":
-
-
-                    break;
-                case "6":
-                    break;
-                case "7":
+                    Console.WriteLine("Exiting the menu. Goodbye!");
+                    Environment.Exit(0);
                     break;
                 default:
                     Console.WriteLine("Invalid selection. Please try again.");
                     break;
             }
         }
+
+
         public async Task GetAnimalByScientificNameWithApi()
         {
             try
             {
                 var animals = await _animalServiceApi.GetAllAnimalsByScientificNameAsync();
-                Console.Write(animals);
-                foreach(var animal in animals)
+                if (animals == null || !animals.Any())
+                {
+                    Console.WriteLine("No animals found with that scientific name.");
+                    return;
+                }
+
+                foreach (var animal in animals)
                 {
                     Console.WriteLine(animal);
+                    Console.WriteLine("---------------------");
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError("Error fetching animals by scientific name from API.", ex);
             }
-
         }
 
 
@@ -96,15 +94,16 @@ namespace finallexamp.Services
             try
             {
                 var animals = await _animalService.GetAllAnimalsByScientificNameAsync();
-                Console.Write(animals);
                 if (animals == null || !animals.Any())
                 {
                     Console.WriteLine("No animals found in the local database.");
                     return;
                 }
+
                 foreach (var animal in animals)
                 {
                     Console.WriteLine(animal);
+                    Console.WriteLine("---------------------");
                 }
             }
             catch (Exception ex)
@@ -113,61 +112,155 @@ namespace finallexamp.Services
             }
         }
 
-        public async Task GetAnimalByScintificName()
+
+        public async Task GetAnimalByScintificNameAsync()
         {
             Console.WriteLine("Animals from api: ");
             await GetAnimalByScientificNameWithApi();
-            
+
             Console.WriteLine("Animals from local DB: ");
             await GetAnimalByScientificNameFromLocalDB();
         }
 
-        public async Task GetAllAnimalsByName()
+
+        public async Task GetAllAnimalsByNameWithApiAsync(string name)
         {
-            Console.WriteLine("Entry Animal name: "); string AnimalName = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(AnimalName))
+            var animals = await _animalServiceApi.GetAllAnimalsByNameAsync(name);
+            if (animals.Animals == null)
             {
-                Console.WriteLine("Animal name cannot be empty. Please try again.");
+                Console.WriteLine("No animals found with that name.");
+                return;
+            }
+            foreach (var animal in animals.Animals)
+            {
+                Console.WriteLine(animal);
+                Console.WriteLine("---------------------");
+            }
+        }
+
+
+        public async Task GetAllAnimalsByNameFromLocalDBAsync(string name)
+        {
+            var animals = await _animalService.GetAllAnimalsByNameAsync(name);
+            if (animals == null || !animals.Any())
+            {
+                Console.WriteLine("No animals found in the local database with that name.");
+                return;
+            }
+            foreach (var animal in animals)
+            {
+                Console.WriteLine(animal);
+                Console.WriteLine("---------------------");
+            }
+        }
+
+        public async Task GetAllAnimalsByNameAsync()
+        {
+            Console.WriteLine("Enter the name of the animal to search: ");
+            string name = Console.ReadLine();
+
+            Console.WriteLine("Animals from api: ");
+            await GetAllAnimalsByNameWithApiAsync(name);
+
+            Console.WriteLine("Animals from local DB: ");
+            await GetAllAnimalsByNameFromLocalDBAsync(name);
+        }
+
+
+        public async Task SortedAnimalByNameWithApiAsync()
+        {
+            var animals = await _animalServiceApi.GetAllAnimalsByNameSortedAsync();
+            if (animals == null)
+            {
+                Console.WriteLine("No animals found in the API.");
                 return;
             }
 
-            Console.WriteLine("Animals from api: ");
+            var sortedAnimals = animals.Animals.OrderBy(a => a.Name).ToList();
 
-            try
+            if (!sortedAnimals.Any())
             {
-                var animals = await _animalServiceApi.GetAllAnimalsByNameAsync(AnimalName);
-                if (animals == null || !animals.Any())
-                {
-                    Console.WriteLine("No animals found with that name.");
-                }
-                else
-                {
-                    foreach (var animal in animals)
-                    {
-                        Console.WriteLine(animal);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Error fetching animals by name from API.", ex);
+                Console.WriteLine("No animals found with that name in the API.");
+                return;
             }
 
-            /*
-            Console.WriteLine("Animals from local DB: ");
-            var animalsFromDb = await _animalService.GetAllAnimalsByNameAsync(AnimalName);
-            if (animalsFromDb == null || !animalsFromDb.Any())
+            foreach (var animal in sortedAnimals)
             {
-                Console.WriteLine("No animals found with that name in the local database.");
+                Console.WriteLine(animal);
+                Console.WriteLine("---------------------");
             }
-            else
-            {
-                foreach (var animal in animalsFromDb)
-                {
-                    Console.WriteLine(animal);
-                }
-            }*/
+        }
 
+
+        public async Task SortedAnimalByNameFromLocalDBAsync()
+        {
+            var animals = await _animalService.GetAllAnimalsByNameSortedAsync();
+            if (animals == null || !animals.Any())
+            {
+                Console.WriteLine("No animals found in the local database.");
+                return;
+            }
+            var sortedAnimals = animals.OrderBy(a => a.Name).ToList();
+            foreach (var animal in sortedAnimals)
+            {
+                Console.WriteLine(animal);
+                Console.WriteLine("---------------------");
+            }
+        }
+
+
+        public async Task SortedAnimalByNameAsync()
+        {
+            Console.WriteLine("Animals sorted by name from API: ");
+            await SortedAnimalByNameWithApiAsync();
+
+            Console.WriteLine("Animals sorted by name from local DB: ");
+            await SortedAnimalByNameFromLocalDBAsync();
+        }
+
+
+        public async Task GetAllAnimalsByCountryCodeAsyncWithApi(string countryCode)
+        {
+            var animals = await _animalServiceApi.GetAllAnimalsByCountryCodeAsync(countryCode);
+            if (animals.Animals == null)
+            {
+                Console.WriteLine($"No animals found for country code {countryCode} in the API.");
+                return;
+            }
+            foreach (var animal in animals.Animals)
+            {
+                Console.WriteLine(animal);
+                Console.WriteLine("---------------------");
+            }
+        }
+
+
+        public async Task GetAllAnimalsByCountryCodeFromLocalDBAsync(string countryCode)
+        {
+            var animals = await _animalService.GetAllAnimalsByCountryCodeAsync(countryCode);
+            if (animals == null || !animals.Any())
+            {
+                Console.WriteLine($"No animals found for country code {countryCode} in the local database.");
+                return;
+            }
+            foreach (var animal in animals)
+            {
+                Console.WriteLine(animal);
+                Console.WriteLine("---------------------");
+            }
+        }
+
+
+        public async Task GetAllAnimalsByCountryCodeAsync()
+        {
+            Console.WriteLine("Enter the country code (e.g., UA, UK): ");
+            string countryCode = Console.ReadLine();
+
+            Console.WriteLine($"Animals from API for country code {countryCode}: ");
+            await GetAllAnimalsByCountryCodeAsyncWithApi(countryCode);
+
+            Console.WriteLine($"Animals from local DB for country code {countryCode}: ");
+            await GetAllAnimalsByCountryCodeFromLocalDBAsync(countryCode);
         }
     }
 }

@@ -20,7 +20,11 @@ namespace finallexamp.Api.Models
         
         public override string ToString()
         {
-            return $"{Name} ({ScientificName}) - {GroupName} [{ConservationStatus}] from {CountryCode}";
+            return $"{Name}" +
+                   $"\n{ScientificName}" +
+                   $"\n{GroupName}" +
+                   $"\n{ConservationStatus}" +
+                   $"\n{CountryCode}";
         }
     }
 }

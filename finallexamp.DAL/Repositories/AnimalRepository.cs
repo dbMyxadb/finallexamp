@@ -13,16 +13,9 @@ namespace finallexamp.DAL.Repositories
             _context = context;
         }
 
-        public async Task<List<Animal>> GetAllAsync() 
+        public async Task<List<Animal>> GetAllAsync()
         {
-            try
-            {
-                return await _context.Animals.ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error fetching animals from the database.", ex);
-            }
+            return await _context.Animals.ToListAsync();
         }
 
 
